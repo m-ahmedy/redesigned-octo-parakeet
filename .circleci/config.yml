@@ -32,7 +32,19 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: cat ~/output.txt
-
+  failing_job:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - run:
+          name: Return non-zero exit code
+          command: return 1
+          shell: /bin/bash
+      - run:
+          name: Handle failing job
+          command: echo "Rolling back"
+          shell: /bin/bash
+          when: on_fail
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
@@ -43,3 +55,6 @@ workflows:
       - print_output_file:
           requires:
             - save_hello_world_output
+      - failing_job:
+          requires:
+            - print_output_file
